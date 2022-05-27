@@ -1,13 +1,12 @@
 version: "3"
 services:
-  bitcoin-core-regtest:
-    container_name: bitcoin-core-regtest
+  bitcoin-core-mainnet:
+    container_name: bitcoin-core-mainnet
     image: ruimarinho/bitcoin-core:0.21.1
     command:
       -printtoconsole
       -txindex=1
       -server=1
-      -regtest=1
     environment:
       - BITCOIN_DATA=/data
     volumes:
@@ -35,16 +34,16 @@ services:
       - "4001:4001"
 #      - "8080:8080"
   
-  ion-bitcoin-regtest:
-    container_name: ion-bitcoin-regtest
+  ion-bitcoin-mainnet:
+    container_name: ion-bitcoin-mainnet
     image: node:lts-alpine3.14
     command: "npm run bitcoin"
     working_dir: /ion
     environment: 
-      - ION_BITCOIN_CONFIG_FILE_PATH=/ion/json/regtest-bitcoin-docker-config.json
-      - ION_BITCOIN_VERSIONING_CONFIG_FILE_PATH=/ion/json/regtest-bitcoin-versioning.json
+      - ION_BITCOIN_CONFIG_FILE_PATH=/ion/json/mainnet-bitcoin-docker-config.json
+      - ION_BITCOIN_VERSIONING_CONFIG_FILE_PATH=/ion/json/mainnet-bitcoin-versioning.json
     links:
-      - "bitcoin-core-regtest"
+      - "bitcoin-core-mainnet"
       - "mongo"
     volumes:
       - ..:/ion
@@ -53,16 +52,16 @@ services:
       - "3002:3002"          
       
 
-  ion-core-regtest:
-    container_name: ion-core-regtest
+  ion-core-mainnet:
+    container_name: ion-core-mainnet
     image: node:lts-alpine3.14
     command: "npm run core"
     working_dir: /ion
     environment: 
-      - ION_CORE_CONFIG_FILE_PATH=/ion/json/regtest-core-docker-config.json
-      - ION_CORE_VERSIONING_CONFIG_FILE_PATH=/ion/json/regtest-core-versioning.json    
+      - ION_CORE_CONFIG_FILE_PATH=/ion/json/mainnet-core-docker-config.json
+      - ION_CORE_VERSIONING_CONFIG_FILE_PATH=/ion/json/mainnet-core-versioning.json    
     links:
-      - "ion-bitcoin-regtest"
+      - "ion-bitcoin-mainnet"
       - "ipfs"
       - "mongo"
     volumes:
