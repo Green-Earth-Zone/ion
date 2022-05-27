@@ -5,11 +5,19 @@ echo "SETTING UP REGTEST CONFIGURATION FOR ION"
 #read bitcoinDataDirectory
 
 # TODO: PASS THIS TO ENV VARIABLE
-bitcoinDataDirectory=/home/andre/Projects/holonic/etribe/did-poc-ion/data/bitcoin
+rootDir="$(pwd)"
+dataDir="$rootDir/data"
+bitcoinDataDirectory="$dataDir/bitcoin-data"
+mkdir -p $dataDir
+# TODO: PASS THIS TO ENV VARIABLE
+coreDataDirectory="$dataDir/data/mongo-data"
+# TODO: PASS THIS TO ENV VARIABLE
+ipfsDataDirectory="$dataDir/data/ipfs-data"
+
 
 if [[ ! -d $bitcoinDataDirectory ]]; then
   echo "$bitcoinDataDirectory is not a directory, creating"
-  mkdir $bitcoinDataDirectory
+  mkdir -p $bitcoinDataDirectory
 fi
 
 if [[ ! -w $bitcoinDataDirectory ]]; then
@@ -20,12 +28,11 @@ fi
 #echo -n "Please enter the directory for storing data for the mongo service: "
 #read coreDataDirectory
 
-# TODO: PASS THIS TO ENV VARIABLE
-coreDataDirectory=/home/andre/Projects/holonic/etribe/did-poc-ion/data/mongo
+
 
 if [[ ! -d $coreDataDirectory ]]; then
   echo "$coreDataDirectory is not a directory"
-  mkdir $coreDataDirectory
+  mkdir -p $coreDataDirectory
 fi
 
 if [[ ! -w $coreDataDirectory ]]; then
@@ -37,12 +44,9 @@ fi
 #echo -n "Please enter the directory for storing data for the IPFS service: "
 #read ipfsDataDirectory
 
-# TODO: PASS THIS TO ENV VARIABLE
-ipfsDataDirectory=/home/andre/Projects/holonic/etribe/did-poc-ion/data/ipfs
-
 if [[ ! -d $ipfsDataDirectory ]]; then
   echo "$ipfsDataDirectory is not a directory"
-  mkdir $ipfsDataDirectory
+  mkdir -p $ipfsDataDirectory
 fi
 
 if [[ ! -w $ipfsDataDirectory ]]; then
@@ -64,22 +68,25 @@ docker start ipfs
 echo "creating config files"
 # generate RPC password
 if [[ -e /dev/urandom ]]; then
-  password=$(head -c 32 /dev/urandom | base64 -)
+  rpcpassword=$(head -c 32 /dev/urandom | base64 -)
 else
-  password=$(head -c 32 /dev/random | base64 -)
+  rpcpassword=$(head -c 32 /dev/random | base64 -)
 fi
+
+rpcpassword="testing"
+rpcuser="admin"
 
 echo "
 regtest=1
 server=1
 txindex=1
-[main]
-rpcuser=admin
-rpcpassword=$password
-rpcport=8332
+[regtest]
+rpcuser=$rpcuser
+rpcpassword=$rpcpassword
 rpcallowip=0.0.0.0/0
 rpcconnect=127.0.0.1
 rpcbind=0.0.0.0
+rpcport=18443
 " > $bitcoinDataDirectory/bitcoin.conf
 
 
@@ -89,9 +96,9 @@ echo "
   \"bitcoinDataDirectory\": \"/bitcoindata\",
   \"bitcoinFeeSpendingCutoffPeriodInBlocks\": 1,
   \"bitcoinFeeSpendingCutoff\": 0.001,
-  \"bitcoinPeerUri\": \"http://bitcoin-core-regtest:8332\",
-  \"bitcoinRpcUsername\": \"admin\",
-  \"bitcoinRpcPassword\": \"$password\",
+  \"bitcoinPeerUri\": \"http://bitcoin-core-regtest:18443\",
+  \"bitcoinRpcUsername\": \"$rpcuser\",
+  \"bitcoinRpcPassword\": \"$rpcpassword\",
   \"bitcoinWalletOrImportString\": \"5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF\",
   \"databaseName\": \"ion-regtest-bitcoin\",
   \"genesisBlockNumber\": 667000,
@@ -120,6 +127,14 @@ When the logs show an entry like \"2020-07-08T03:39:41Z UpdateTip: new best=0000
 
 Please be patient. It takes a minute before the syncing starts and after that it can take up to 24 hours to download the entire database.
 \n\n"
+
+# create a wallet for the bitcoin node
+docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  createwallet "bitcoin-wallet"
+#load the wallet with the import string LOOKS LIKE WALLET ALREADY LOADS
+# docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  loadwallet "bitcoin-wallet"
+#generate 101 blocks
+docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  -generate 101
+
 
 # wait for download
 # TODO: Uncomment this
