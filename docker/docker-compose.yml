@@ -48,6 +48,7 @@ services:
     environment:
       - ION_BITCOIN_CONFIG_FILE_PATH=/ion/json/regtest-bitcoin-docker-config.json
       - ION_BITCOIN_VERSIONING_CONFIG_FILE_PATH=/ion/json/regtest-bitcoin-versioning.json
+    user: "999:1000"
     volumes:
       - ..:/ion
       - ${DATA_VOL}:/bitcoindata

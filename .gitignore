@@ -1,7 +1,7 @@
 dist/
 node_modules/
 nunitresults.xml
-
+docker/data/
 # Istanbul code coverage folders
 .nyc_output/
 coverage/

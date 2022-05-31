@@ -7,12 +7,12 @@ echo "SETTING UP REGTEST CONFIGURATION FOR ION"
 # TODO: PASS THIS TO ENV VARIABLE
 rootDir="$(pwd)"
 dataDir="$rootDir/data"
-bitcoinDataDirectory="$dataDir/bitcoin-data"
+bitcoinDataDirectory="$dataDir/bitcoindata"
 mkdir -p $dataDir
 # TODO: PASS THIS TO ENV VARIABLE
-coreDataDirectory="$dataDir/data/mongo-data"
+coreDataDirectory="$dataDir/mongo-data"
 # TODO: PASS THIS TO ENV VARIABLE
-ipfsDataDirectory="$dataDir/data/ipfs-data"
+ipfsDataDirectory="$dataDir/ipfs-data"
 
 
 if [[ ! -d $bitcoinDataDirectory ]]; then
@@ -93,15 +93,15 @@ rpcport=18443
 # create the configuration for ION Bitcoin service
 echo "
 {
-  \"bitcoinDataDirectory\": \"/bitcoindata\",
+  \"bitcoinDataDirectory\": \"/bitcoindata/regtest\",
   \"bitcoinFeeSpendingCutoffPeriodInBlocks\": 1,
   \"bitcoinFeeSpendingCutoff\": 0.001,
   \"bitcoinPeerUri\": \"http://bitcoin-core-regtest:18443\",
   \"bitcoinRpcUsername\": \"$rpcuser\",
   \"bitcoinRpcPassword\": \"$rpcpassword\",
-  \"bitcoinWalletOrImportString\": \"5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF\",
+  \"bitcoinWalletOrImportString\": \"92gX1abLs6GMe6emuwy7LLbrRphvL8CHZM8TdaabQ6ZZAMx5jxg\",
   \"databaseName\": \"ion-regtest-bitcoin\",
-  \"genesisBlockNumber\": 667000,
+  \"genesisBlockNumber\": 0,
   \"logRequestError\": true,
   \"mongoDbConnectionString\": \"mongodb://mongo:27017/\",
   \"port\": 3002,
@@ -129,7 +129,9 @@ Please be patient. It takes a minute before the syncing starts and after that it
 \n\n"
 
 # create a wallet for the bitcoin node
-docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  createwallet "bitcoin-wallet"
+# docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  createwallet "sidetreeDefaultWallet"
+# docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  loadwallet "sidetreeDefaultWallet"
+# docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  loadwallet "sidetreeDefaultWallet"
 #load the wallet with the import string LOOKS LIKE WALLET ALREADY LOADS
 # docker exec bitcoin-core-regtest bitcoin-cli -chain=regtest -rpcuser=$rpcuser -rpcpassword=$rpcpassword  loadwallet "bitcoin-wallet"
 #generate 101 blocks
