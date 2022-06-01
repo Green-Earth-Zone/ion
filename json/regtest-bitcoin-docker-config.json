@@ -1,0 +1,22 @@
+
+{
+  "bitcoinDataDirectory": "/bitcoindata/regtest",
+  "bitcoinFeeSpendingCutoffPeriodInBlocks": 1,
+  "bitcoinFeeSpendingCutoff": 0.001,
+  "bitcoinPeerUri": "http://bitcoin-core-regtest:18443",
+  "bitcoinRpcUsername": "rpcuser",
+  "bitcoinRpcPassword": "rpcpass",
+  "bitcoinWalletOrImportString": "92YboFMXfs3Ao1BhoUC8qn1nfpPwrn1VFriwnezALbXADHYq8pa",
+  "databaseName": "ion-regtest-bitcoin",
+  "genesisBlockNumber": 100,
+  "logRequestError": true,
+  "mongoDbConnectionString": "mongodb://mongo:27017/",
+  "port": 3002,
+  "sidetreeTransactionFeeMarkupPercentage": 1,
+  "sidetreeTransactionPrefix": "ion:",
+  "transactionPollPeriodInSeconds": 60,
+  "valueTimeLockUpdateEnabled": false,
+  "valueTimeLockAmountInBitcoins": 0,
+  "valueTimeLockPollPeriodInSeconds": 600,
+  "valueTimeLockTransactionFeesAmountInBitcoins": 0.0001
+}

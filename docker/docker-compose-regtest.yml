@@ -1,0 +1,71 @@
+version: "3"
+services:
+  bitcoin-core-regtest:
+    container_name: bitcoin-core-regtest
+    image: ruimarinho/bitcoin-core:0.21.1
+    command:
+      -printtoconsole
+      -txindex=1
+      -server=1
+    environment:
+      - BITCOIN_DATA=/data
+    volumes:
+      - ${DATA_VOL}:/data
+#    ports: 
+#      - "8332:8332"
+#      - "8333:8333"
+  mongo:
+    container_name: mongo
+    image: mongo:4.0.27-xenial
+#    ports: 
+#      - "27017:27017"
+    volumes:
+      - ${DB_VOL}:/data/db
+  ipfs:
+    container_name: ipfs
+#this image doesn't work on ARM64 yet, use mhoekstra/go-ipfs:v0.7.0 if you want to deploy on ARM    
+    image: ipfs/go-ipfs
+    environment: 
+      - IPFS_PATH=/data/ipfs
+    volumes:
+      - ${IPFS_VOL}:/data/ipfs
+    ports:
+#      - "5001:5001"
+      - "4001:4001"
+#      - "8080:8080"
+  
+  ion-bitcoin-regtest:
+    container_name: ion-bitcoin-regtest
+    image: node:lts-alpine3.14
+    command: "npm run bitcoin"
+    working_dir: /ion
+    user: "999:999"
+    environment: 
+      - ION_BITCOIN_CONFIG_FILE_PATH=/ion/json/regtest-bitcoin-docker-config.json
+      - ION_BITCOIN_VERSIONING_CONFIG_FILE_PATH=/ion/json/regtest-bitcoin-versioning.json
+    links:
+      - "bitcoin-core-regtest"
+      - "mongo"
+    volumes:
+      - ..:/ion
+      - ${DATA_VOL}:/bitcoindata
+    ports:
+      - "3002:3002"          
+      
+
+  ion-core-regtest:
+    container_name: ion-core-regtest
+    image: node:lts-alpine3.14
+    command: "npm run core"
+    working_dir: /ion
+    environment: 
+      - ION_CORE_CONFIG_FILE_PATH=/ion/json/regtest-core-docker-config.json
+      - ION_CORE_VERSIONING_CONFIG_FILE_PATH=/ion/json/regtest-core-versioning.json    
+    links:
+      - "ion-bitcoin-regtest"
+      - "ipfs"
+      - "mongo"
+    volumes:
+      - ..:/ion
+    ports:
+      - "3000:3000"
